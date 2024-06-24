@@ -1,5 +1,6 @@
 package com.example.util;
 
+import com.example.dto.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -25,8 +26,19 @@ public class FormatApiResponse implements ResponseBodyAdvice {
             Class selectedConverterType,
             ServerHttpRequest request,
             ServerHttpResponse response) {
-        HttpServletResponse servletResponse =  ((ServletServerHttpResponse) response).getServletResponse();
-        Integer status= servletResponse.getStatus();
-        return body;
+        HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
+        Integer status = servletResponse.getStatus();
+        ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+        apiResponse.setStatusCode(status);
+
+        if (status >= 400) {
+            // case error
+            return body;
+        } else {
+            // case success
+            apiResponse.setMessage("CALL API SUCCESS");
+            apiResponse.setData(body);
+        }
+        return apiResponse;
     }
 }
