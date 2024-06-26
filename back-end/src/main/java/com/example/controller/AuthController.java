@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,9 +31,11 @@ public class AuthController {
                 request.getUsername(),
                 request.getPassword()
         );
-//        Xác thực người dùng
+//        Xác thực người dùng => build function loadUserByUserName
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        // create token
         String accessToken = this.securityService.createToken(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         return ResponseEntity.status(HttpStatus.OK).body(
                 LoginResponse.builder()
                         .accessToken(accessToken)

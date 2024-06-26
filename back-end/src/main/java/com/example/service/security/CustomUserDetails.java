@@ -16,7 +16,7 @@ import java.util.Collections;
 @Component("userDetailsService")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserDetailsCustom implements UserDetailsService {
+public class CustomUserDetails implements UserDetailsService {
     UserService userService;
 
     @SneakyThrows

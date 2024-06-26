@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers() {
         return userRepository.findAll();
     }
-
+    // log ra thông báo chung chung để ko bị lộ-> cần sửa lại
     @Override
     public User getUserByEmail(String email) throws DataNoFoundException {
         User existingUser = userRepository.findByEmail(email).orElseThrow(() -> (

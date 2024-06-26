@@ -17,11 +17,12 @@ import java.util.List;
 public class GlobalException {
 
     @ExceptionHandler(value = {UsernameNotFoundException.class, BadCredentialsException.class})
-    public ResponseEntity<ApiResponse<Object>> handleSecurityException(
-            UsernameNotFoundException usernameNotFoundException,
-            BadCredentialsException badCredentialsException
-    ) {
-        return null;
+    public ResponseEntity<ApiResponse<Object>> handleSecurityException(Exception exception) {
+        ApiResponse<Object> apiResponse= new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        apiResponse.setError(exception.getMessage());
+        apiResponse.setMessage("Exception occurs...");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
     }
 
     @ExceptionHandler(value = DataNoFoundException.class)
