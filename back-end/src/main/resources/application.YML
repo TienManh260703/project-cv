@@ -1,3 +1,5 @@
+server:
+  port: 8080
 spring:
   application:
     name: back-end
@@ -14,6 +16,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
 
-server:
-  port: 8080
