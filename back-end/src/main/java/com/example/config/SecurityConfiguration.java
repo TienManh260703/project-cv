@@ -25,11 +25,6 @@ public class SecurityConfiguration {
              "/",
              "/login"
      };
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
@@ -39,8 +34,8 @@ public class SecurityConfiguration {
                         authz -> authz
                                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                                 .anyRequest().authenticated())
-                // call bean jwtDecoder => get token
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
+                // ( BR ) throw bean jwtDecoder => get token
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()) // tự động thêm ( Br )BearerTokenAuthenticationFilter
                 // DI : custom exception
                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
@@ -53,6 +48,13 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // sau khi gửi token lên server và nạp vào security context holder
+    // nạp vào context holder để tái sử dụng
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new
