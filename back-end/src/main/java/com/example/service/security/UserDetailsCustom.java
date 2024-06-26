@@ -1,6 +1,5 @@
-package com.example.service.impl;
+package com.example.service.security;
 
-import com.example.entity.User;
 import com.example.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.dto.request.LoginRequest;
+import com.example.dto.response.LoginResponse;
+import com.example.service.security.SecurityService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     AuthenticationManagerBuilder authenticationManagerBuilder;
+    SecurityService securityService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login (@Valid @RequestBody LoginRequest request){
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 request.getUsername(),
                 request.getPassword()
         );
 //        Xác thực người dùng
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        return ResponseEntity.status(HttpStatus.OK).body(request);
+        String accessToken = this.securityService.createToken(authentication);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                LoginResponse.builder()
+                        .accessToken(accessToken)
+                        .build());
     }
 }

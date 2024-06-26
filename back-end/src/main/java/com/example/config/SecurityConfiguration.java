@@ -21,6 +21,8 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -31,7 +33,6 @@ public class SecurityConfiguration {
                                 .requestMatchers("/users").permitAll()
 //                                .anyRequest().authenticated()
                                 .anyRequest().permitAll()
-
                 )
                 .formLogin(f -> f.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
