@@ -15,6 +15,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +35,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json;charset=UTF-8");
         ApiResponse<Object> apiResponse = new ApiResponse<>();
         apiResponse.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-        apiResponse.setError(authException.getCause().getMessage());
+        String errorMessage = Optional.ofNullable(authException.getCause())
+                .map(Throwable::getMessage)
+                .orElse(authException.getMessage());
+        apiResponse.setError(errorMessage);
         apiResponse.setMessage("Token invalid ( expired, malformed ... )");
         mapper.writeValue(response.getWriter(),apiResponse);
     }

@@ -46,4 +46,13 @@ public class GlobalException {
         apiResponse.setMessage(error.size() > 1 ? error : error.get(0));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
     }
+
+    @ExceptionHandler(value = NumberFormatException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNumberFormatException (NumberFormatException exception){
+        ApiResponse<Object> apiResponse = new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        apiResponse.setError(exception.getMessage());
+        apiResponse.setMessage("Cannot format number");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
+    }
 }

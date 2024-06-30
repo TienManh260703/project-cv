@@ -1,5 +1,8 @@
 package com.example.service.impl;
 
+import com.example.dto.response.Meta;
+import com.example.dto.response.ResultPaginationResponse;
+import com.example.entity.Company;
 import com.example.entity.User;
 import com.example.exception.DataNoFoundException;
 import com.example.repository.UserRepository;
@@ -7,10 +10,14 @@ import com.example.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +25,29 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
+
+    @Override
+    public ResultPaginationResponse getUserPage(Optional<String> current, Optional<String> pageSize) {
+        String sCurrent = current.isPresent() ? current.get() : "0";
+        String sPageSize = pageSize.isPresent() ? pageSize.get() : "5";
+
+        Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        Meta meta = Meta.builder()
+                .page(userPage.getNumber() + 1)
+                .pageSize(userPage.getSize())
+                .pages(userPage.getTotalPages())
+                .total(userPage.getTotalElements())
+                .build();
+
+        ResultPaginationResponse response = ResultPaginationResponse
+                .builder()
+                .meta(meta)
+                .result(userPage.getContent())
+                .build();
+        return response;
+    }
 
     @Override
     public User getUser(Long id) throws DataNoFoundException {

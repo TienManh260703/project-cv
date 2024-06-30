@@ -25,6 +25,6 @@ manh-nt:
   jwt:
     base64-secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 # expiration : 1 day (seconds)
-    token-validity-in-seconds: 86400
+    token-validity-in-seconds: 8640000
 
 
