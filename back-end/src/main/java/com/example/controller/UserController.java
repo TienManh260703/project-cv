@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.annotation.ApiMessage;
 import com.example.dto.response.ResultPaginationResponse;
 import com.example.entity.User;
 import com.example.exception.DataNoFoundException;
@@ -15,13 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("${api.prefix}/users")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
 
     @GetMapping("{id}")
+    @ApiMessage("Get User By Id")
     public ResponseEntity<User> getUserById(
             @PathVariable Long id) throws DataNoFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(id));
@@ -36,6 +38,7 @@ public class UserController {
 //    }
 
     @GetMapping
+    @ApiMessage("Get All User Filter")
     public ResponseEntity<ResultPaginationResponse> getUsersFilter(
             @Filter Specification<User> spec,
             Pageable pageable
@@ -46,12 +49,14 @@ public class UserController {
     }
 
     @PostMapping
+    @ApiMessage("Created User Success")
     public ResponseEntity<User> createUser(@RequestBody User request) {
         User user = userService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @PutMapping
+    @ApiMessage("Updated User Success")
     public ResponseEntity<User> updateUser(@RequestBody User request) throws DataNoFoundException {
         User user = userService.update(request);
         return ResponseEntity.status(HttpStatus.OK).body(user);

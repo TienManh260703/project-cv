@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.annotation.ApiMessage;
 import com.example.dto.request.CompanyRequest;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.ResultPaginationResponse;
@@ -18,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("companies")
+@RequestMapping("${api.prefix}/companies")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CompanyController {
@@ -33,6 +34,7 @@ public class CompanyController {
 //    }
 
     @GetMapping
+    @ApiMessage("Get User Filter")
     public ResponseEntity<ResultPaginationResponse> getCompanyFilter(
             @Filter Specification<Company> specification, Pageable pageable
     ) {
@@ -40,17 +42,20 @@ public class CompanyController {
     }
 
     @GetMapping("{id}")
+    @ApiMessage("Get User By Id")
     public ResponseEntity<CompanyResponse> getCompanyById(@PathVariable Long id) throws DataNoFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(companyService.getCompany(id));
     }
 
     @PostMapping
+    @ApiMessage("Created User Success")
     public ResponseEntity<CompanyResponse> createCompany(@Valid @RequestBody CompanyRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 companyService.createCompany(request));
     }
 
     @PutMapping("{id}")
+    @ApiMessage("Updated User Success")
     public ResponseEntity<CompanyResponse> updateCompanyById(
             @PathVariable Long id,
             @Valid @RequestBody CompanyRequest request

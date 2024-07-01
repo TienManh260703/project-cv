@@ -1,5 +1,6 @@
 package com.example.util;
 
+import com.example.annotation.ApiMessage;
 import com.example.dto.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
@@ -39,7 +40,8 @@ public class FormatApiResponse implements ResponseBodyAdvice {
             return body;
         } else {
             // case success
-            apiResponse.setMessage("CALL API SUCCESS");
+            ApiMessage message = returnType.getMethodAnnotation(ApiMessage.class);
+            apiResponse.setMessage(message !=null ? message.value() : "CALL API SUCCESS");
             apiResponse.setData(body);
         }
         return apiResponse;
