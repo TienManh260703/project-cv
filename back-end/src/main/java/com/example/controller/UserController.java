@@ -1,11 +1,16 @@
 package com.example.controller;
 
-import com.example.annotation.ApiMessage;
+import com.example.dto.request.CreateUserRequest;
+import com.example.dto.request.UpdateUserRequest;
+import com.example.dto.response.UserResponse;
+import com.example.exception.AppException;
+import com.example.util.annotation.ApiMessage;
 import com.example.dto.response.ResultPaginationResponse;
 import com.example.entity.User;
 import com.example.exception.DataNoFoundException;
 import com.example.service.UserService;
 import com.turkraft.springfilter.boot.Filter;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +29,7 @@ public class UserController {
 
     @GetMapping("{id}")
     @ApiMessage("Get User By Id")
-    public ResponseEntity<User> getUserById(
+    public ResponseEntity<UserResponse> getUserById(
             @PathVariable Long id) throws DataNoFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(id));
     }
@@ -50,22 +55,23 @@ public class UserController {
 
     @PostMapping
     @ApiMessage("Created User Success")
-    public ResponseEntity<User> createUser(@RequestBody User request) {
-        User user = userService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) throws AppException {
+        UserResponse response = userService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
     @ApiMessage("Updated User Success")
-    public ResponseEntity<User> updateUser(@RequestBody User request) throws DataNoFoundException {
-        User user = userService.update(request);
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UpdateUserRequest request) throws DataNoFoundException {
+        UserResponse response = userService.update(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    @ApiMessage("Delete A User")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) throws DataNoFoundException {
         userService.deleted(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(null);
     }
 
 }

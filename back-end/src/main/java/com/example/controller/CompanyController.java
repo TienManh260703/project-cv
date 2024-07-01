@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.annotation.ApiMessage;
+import com.example.util.annotation.ApiMessage;
 import com.example.dto.request.CompanyRequest;
 import com.example.dto.response.CompanyResponse;
 import com.example.dto.response.ResultPaginationResponse;

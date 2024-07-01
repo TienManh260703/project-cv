@@ -1,7 +1,11 @@
 package com.example.service;
 
+import com.example.dto.request.CreateUserRequest;
+import com.example.dto.request.UpdateUserRequest;
 import com.example.dto.response.ResultPaginationResponse;
+import com.example.dto.response.UserResponse;
 import com.example.entity.User;
+import com.example.exception.AppException;
 import com.example.exception.DataNoFoundException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,16 +18,16 @@ public interface UserService {
 
     ResultPaginationResponse getUserFilter(Specification<User> spec , Pageable pageable);
 
-    User getUser(Long id) throws DataNoFoundException;
+    UserResponse getUser(Long id) throws DataNoFoundException;
 
-    List<User> getUsers();
+    List<UserResponse> getUsers();
 
     User getUserByEmail(String email) throws DataNoFoundException;
 
-    User create(User request);
+    UserResponse create(CreateUserRequest request) throws AppException;
 
-    User update(User request) throws DataNoFoundException;
+    UserResponse update(UpdateUserRequest request) throws DataNoFoundException;
 
-    void deleted(Long id);
+    void deleted(Long id) throws DataNoFoundException;
 
 }

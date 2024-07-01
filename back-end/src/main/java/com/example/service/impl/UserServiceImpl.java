@@ -1,8 +1,12 @@
 package com.example.service.impl;
 
+import com.example.dto.request.CreateUserRequest;
+import com.example.dto.request.UpdateUserRequest;
 import com.example.dto.response.Meta;
 import com.example.dto.response.ResultPaginationResponse;
+import com.example.dto.response.UserResponse;
 import com.example.entity.User;
+import com.example.exception.AppException;
 import com.example.exception.DataNoFoundException;
 import com.example.repository.UserRepository;
 import com.example.service.UserService;
@@ -67,14 +71,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(Long id) throws DataNoFoundException {
-        return userRepository.findById(id).orElseThrow(
+    public UserResponse getUser(Long id) throws DataNoFoundException {
+        User existingUser = userRepository.findById(id).orElseThrow(
                 () -> new DataNoFoundException("Data not found"));
+        return UserResponse.transUser(existingUser);
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getUsers() {
+        return userRepository.findAll().stream().map(
+                user -> UserResponse.transUser(user)
+        ).toList();
     }
 
     // log ra thông báo chung chung để ko bị lộ-> cần sửa lại
@@ -87,25 +94,58 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User request) {
-        String hashPassword = this.passwordEncoder.encode(request.getPassword());
-        request.setPassword(hashPassword);
-        return userRepository.save(request);
+    public UserResponse create(CreateUserRequest request) throws AppException {
+        if (this.userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException("Email " + request.getEmail() + " already exists");
+        }
+        User response = userRepository.save(convertCreateUserRequestToUser(request));
+        return UserResponse.transUser(response);
     }
 
     @Override
-    public User update(User request) throws DataNoFoundException {
-        String hashPassword = this.passwordEncoder.encode(request.getPassword());
-        User existingUser = getUser(request.getId());
-        existingUser.setEmail(request.getEmail());
+    public UserResponse update(UpdateUserRequest request) throws DataNoFoundException {
+        User existingUser = userRepository.findById(request.getId()).orElseThrow(
+                () -> new DataNoFoundException("Data not found"));
         existingUser.setName(request.getName());
-        existingUser.setPassword(hashPassword);
+        existingUser.setAge(request.getAge());
+        existingUser.setAddress(request.getAddress());
+        existingUser.setGender(request.getGender());
+
         User response = userRepository.save(existingUser);
-        return response;
+        return UserResponse.transUser(response);
     }
 
     @Override
-    public void deleted(Long id) {
-        userRepository.deleteById(id);
+    public void deleted(Long id) throws DataNoFoundException {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            userRepository.deleteById(id);
+            return;
+        }
+        throw new DataNoFoundException("Cannot find user with id : " + id);
+    }
+
+    private User convertCreateUserRequestToUser(CreateUserRequest request) {
+        String hashPassword = this.passwordEncoder.encode(request.getPassword());
+        return User
+                .builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(hashPassword)
+                .gender(request.getGender())
+                .address(request.getAddress())
+                .age(request.getAge())
+                .build();
+    }
+
+    private User convertUpdateUserRequestToUser(UpdateUserRequest request) {
+        return User
+                .builder()
+                .id(request.getId())
+                .name(request.getName())
+                .age(request.getAge())
+                .gender(request.getGender())
+                .address(request.getAddress())
+                .build();
     }
 }

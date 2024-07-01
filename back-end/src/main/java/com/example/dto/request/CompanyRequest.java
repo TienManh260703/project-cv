@@ -24,12 +24,4 @@ public class CompanyRequest {
     String logo;
     String address;
     String description;
-    @JsonProperty("created_at")
-    Instant createdAt;
-    @JsonProperty("updated_at")
-    Instant updatedAt;
-    @JsonProperty("created_by")
-    String createdBy;
-    @JsonProperty("updated_by")
-    String updatedBy;
 }

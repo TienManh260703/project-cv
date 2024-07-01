@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class GlobalException {
 
     @ExceptionHandler(value = {UsernameNotFoundException.class, BadCredentialsException.class})
     public ResponseEntity<ApiResponse<Object>> handleSecurityException(Exception exception) {
-        ApiResponse<Object> apiResponse= new ApiResponse<>();
+        ApiResponse<Object> apiResponse = new ApiResponse<>();
         apiResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
         apiResponse.setError(exception.getMessage());
         apiResponse.setMessage("Exception occurs...");
@@ -48,11 +49,29 @@ public class GlobalException {
     }
 
     @ExceptionHandler(value = NumberFormatException.class)
-    public ResponseEntity<ApiResponse<Object>> handleNumberFormatException (NumberFormatException exception){
+    public ResponseEntity<ApiResponse<Object>> handleNumberFormatException(NumberFormatException exception) {
         ApiResponse<Object> apiResponse = new ApiResponse<>();
         apiResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
         apiResponse.setError(exception.getMessage());
         apiResponse.setMessage("Cannot format number");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
+    }
+
+    @ExceptionHandler(value = NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNoResourceFoundException(NoResourceFoundException exception) {
+        ApiResponse<Object> apiResponse = new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.NOT_FOUND.value());
+        apiResponse.setError(exception.getMessage());
+        apiResponse.setMessage("The path does not exist : 404");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
+    }
+
+    @ExceptionHandler(value = AppException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAppException (AppException exception){
+        ApiResponse<Object> apiResponse = new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        apiResponse.setError(exception.getMessage());
+        apiResponse.setMessage("App error");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
     }
 }
