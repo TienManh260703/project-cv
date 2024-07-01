@@ -2,7 +2,6 @@ package com.example.service.impl;
 
 import com.example.dto.response.Meta;
 import com.example.dto.response.ResultPaginationResponse;
-import com.example.entity.Company;
 import com.example.entity.User;
 import com.example.exception.DataNoFoundException;
 import com.example.repository.UserRepository;
@@ -13,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +50,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResultPaginationResponse getUserFilter(Specification<User> spec, Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(spec, pageable);
+        Meta meta = Meta.builder()
+                .page(userPage.getNumber() + 1)
+                .pageSize(userPage.getSize())
+                .pages(userPage.getTotalPages())
+                .total(userPage.getTotalElements())
+                .build();
+        ResultPaginationResponse response = ResultPaginationResponse
+                .builder()
+                .meta(meta)
+                .result(userPage.getContent())
+                .build();
+        return response;
+    }
+
+    @Override
     public User getUser(Long id) throws DataNoFoundException {
         return userRepository.findById(id).orElseThrow(
                 () -> new DataNoFoundException("Data not found"));
@@ -59,6 +76,7 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers() {
         return userRepository.findAll();
     }
+
     // log ra thông báo chung chung để ko bị lộ-> cần sửa lại
     @Override
     public User getUserByEmail(String email) throws DataNoFoundException {

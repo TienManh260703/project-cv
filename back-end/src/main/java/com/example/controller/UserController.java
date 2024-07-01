@@ -4,14 +4,15 @@ import com.example.dto.response.ResultPaginationResponse;
 import com.example.entity.User;
 import com.example.exception.DataNoFoundException;
 import com.example.service.UserService;
+import com.turkraft.springfilter.boot.Filter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("users")
@@ -26,12 +27,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(id));
     }
 
+//    @GetMapping
+//    public ResponseEntity<ResultPaginationResponse> getUsers(
+//            @RequestParam(name = "current", defaultValue = "0") Optional<String> current,
+//            @RequestParam(name = "pageSize", defaultValue = "5") Optional<String> pageSize
+//    ) {
+//        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserPage(current, pageSize));
+//    }
+
     @GetMapping
-    public ResponseEntity<ResultPaginationResponse> getUsers(
-            @RequestParam(name = "current", defaultValue = "0") Optional<String> current,
-            @RequestParam(name = "pageSize", defaultValue = "5") Optional<String> pageSize
+    public ResponseEntity<ResultPaginationResponse> getUsersFilter(
+            @Filter Specification<User> spec,
+            Pageable pageable
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserPage(current, pageSize));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                userService.getUserFilter(spec, pageable)
+        );
     }
 
     @PostMapping

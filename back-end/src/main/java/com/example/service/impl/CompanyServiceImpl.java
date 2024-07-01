@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +35,24 @@ public class CompanyServiceImpl implements CompanyService {
 
         Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
         Page<Company> companyPage = companyRepository.findAll(pageable);
+        Meta meta = Meta.builder()
+                .page(companyPage.getNumber() + 1)
+                .pageSize(companyPage.getSize())
+                .pages(companyPage.getTotalPages())
+                .total(companyPage.getTotalElements())
+                .build();
+
+        ResultPaginationResponse response = ResultPaginationResponse
+                .builder()
+                .meta(meta)
+                .result(companyPage.getContent())
+                .build();
+        return response;
+    }
+
+    @Override
+    public ResultPaginationResponse getCompanyFilter(Specification<Company> specification, Pageable pageable) {
+        Page<Company> companyPage = companyRepository.findAll(specification, pageable);
         Meta meta = Meta.builder()
                 .page(companyPage.getNumber() + 1)
                 .pageSize(companyPage.getSize())
