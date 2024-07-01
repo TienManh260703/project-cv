@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,7 +54,7 @@ public class AuthController {
                     new LoginResponse.UserLoginResponse(currentUser.getId(), currentUser.getEmail(), currentUser.getName());
             loginResponse.setUser(userLogin);
         }
-        String accessToken = this.securityService.createAccessToken(authentication , loginResponse.getUser());
+        String accessToken = this.securityService.createAccessToken(authentication, loginResponse.getUser());
         loginResponse.setAccessToken(accessToken);
 
         // refresh token
@@ -77,15 +78,25 @@ public class AuthController {
     @GetMapping("/account")
     @ApiMessage("Get Account User")
     public ResponseEntity<LoginResponse.UserLoginResponse> getAccount() throws DataNoFoundException {
-        String email =SecurityService.getCurrentUserLogin().isPresent()
+        String email = SecurityService.getCurrentUserLogin().isPresent()
                 ? SecurityService.getCurrentUserLogin().get() : "";
         User currentUser = this.userService.getUserByEmail(email);
         LoginResponse.UserLoginResponse userLogin = new LoginResponse.UserLoginResponse();
         if (currentUser != null) {
-           userLogin.setId(currentUser.getId());
-           userLogin.setEmail(currentUser.getEmail());
-           userLogin.setName(currentUser.getName());
+            userLogin.setId(currentUser.getId());
+            userLogin.setEmail(currentUser.getEmail());
+            userLogin.setName(currentUser.getName());
         }
         return ResponseEntity.status(HttpStatus.OK).body(userLogin);
+    }
+
+    @GetMapping("/refresh")
+    @ApiMessage("Get User By Refresh Token")
+    public ResponseEntity<String> getRefreshToken(
+            @CookieValue(name = "refresh_token") String refreshToken
+    ) {
+        Jwt decodedToken = this.securityService.checkValidRefreshToken(refreshToken);
+        String email = decodedToken.getSubject();
+        return ResponseEntity.ok(email);
     }
 }

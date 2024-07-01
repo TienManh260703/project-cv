@@ -21,7 +21,8 @@ public class SecurityConfiguration {
 
      String[] PUBLIC_ENDPOINTS ={
              "/",
-             "/api/v1/auth/login"
+             "/api/v1/auth/login",
+             "/api/v1/auth/refresh"
      };
 
     @Bean
@@ -52,6 +53,7 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    // Lấy tt từ JWT nạp vào Authorities (setAuthoritiesClaimName)
     // sau khi gửi token lên server và nạp vào security context holder
     // nạp vào context holder để tái sử dụng
     @Bean
@@ -59,7 +61,7 @@ public class SecurityConfiguration {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new
                 JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("user");// user -> SecurityService
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");// permission -> SecurityService
         JwtAuthenticationConverter jwtAuthenticationConverter = new
                 JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
