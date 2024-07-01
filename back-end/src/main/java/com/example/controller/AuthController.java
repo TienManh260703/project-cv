@@ -2,6 +2,9 @@ package com.example.controller;
 
 import com.example.dto.request.LoginRequest;
 import com.example.dto.response.LoginResponse;
+import com.example.entity.User;
+import com.example.exception.DataNoFoundException;
+import com.example.service.UserService;
 import com.example.service.security.SecurityService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -26,9 +29,10 @@ public class AuthController {
 
     AuthenticationManagerBuilder authenticationManagerBuilder;
     SecurityService securityService;
+    UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) throws DataNoFoundException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 request.getUsername(),
                 request.getPassword()
@@ -38,9 +42,16 @@ public class AuthController {
         // create token
         String accessToken = this.securityService.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                LoginResponse.builder()
-                        .accessToken(accessToken)
-                        .build());
+
+        User currentUser = this.userService.getUserByEmail(request.getUsername());
+        LoginResponse loginResponse = new LoginResponse();
+        if (currentUser != null) {
+            LoginResponse.UserLoginResponse userLogin =
+                    new LoginResponse.UserLoginResponse(currentUser.getId(), currentUser.getEmail(), currentUser.getName());
+            loginResponse.setUser(userLogin);
+        }
+        
+        loginResponse.setAccessToken(accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
     }
 }

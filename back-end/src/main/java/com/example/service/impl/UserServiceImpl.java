@@ -62,10 +62,14 @@ public class UserServiceImpl implements UserService {
                 .pages(userPage.getTotalPages())
                 .total(userPage.getTotalElements())
                 .build();
+
+        List<UserResponse> listUser = userPage.getContent().stream().map(
+                user -> UserResponse.transUser(user)).toList();
+
         ResultPaginationResponse response = ResultPaginationResponse
                 .builder()
                 .meta(meta)
-                .result(userPage.getContent())
+                .result(listUser)
                 .build();
         return response;
     }
