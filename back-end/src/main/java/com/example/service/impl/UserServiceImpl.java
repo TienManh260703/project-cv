@@ -53,8 +53,8 @@ public class UserServiceImpl implements UserService {
     public ResultPaginationResponse getUserFilter(Specification<User> spec, Pageable pageable) {
         Page<User> userPage = userRepository.findAll(spec, pageable);
         Meta meta = Meta.builder()
-                .page(userPage.getNumber() + 1)
-                .pageSize(userPage.getSize())
+                .page(pageable.getPageNumber() + 1)
+                .pageSize(pageable.getPageSize())
                 .pages(userPage.getTotalPages())
                 .total(userPage.getTotalElements())
                 .build();

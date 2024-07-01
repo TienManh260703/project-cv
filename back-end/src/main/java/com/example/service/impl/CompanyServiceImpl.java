@@ -54,8 +54,8 @@ public class CompanyServiceImpl implements CompanyService {
     public ResultPaginationResponse getCompanyFilter(Specification<Company> specification, Pageable pageable) {
         Page<Company> companyPage = companyRepository.findAll(specification, pageable);
         Meta meta = Meta.builder()
-                .page(companyPage.getNumber() + 1)
-                .pageSize(companyPage.getSize())
+                .page(pageable.getPageNumber() + 1)
+                .pageSize(pageable.getPageSize())
                 .pages(companyPage.getTotalPages())
                 .total(companyPage.getTotalElements())
                 .build();
