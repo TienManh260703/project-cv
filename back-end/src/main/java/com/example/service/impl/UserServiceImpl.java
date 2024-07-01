@@ -129,6 +129,15 @@ public class UserServiceImpl implements UserService {
         throw new DataNoFoundException("Cannot find user with id : " + id);
     }
 
+    @Override
+    public void updateUserToken(String token, String email) throws DataNoFoundException {
+        User existingUser = this.getUserByEmail(email);
+        if (existingUser != null) {
+            existingUser.setRefreshToken(token);
+            this.userRepository.save(existingUser);
+        }
+    }
+
     private User convertCreateUserRequestToUser(CreateUserRequest request) {
         String hashPassword = this.passwordEncoder.encode(request.getPassword());
         return User

@@ -27,7 +27,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     GenderEnum gender;
     String address;
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token",columnDefinition = "MEDIUMTEXT")
     String refreshToken;
     @Column(name = "created_at")
     Instant createdAt;

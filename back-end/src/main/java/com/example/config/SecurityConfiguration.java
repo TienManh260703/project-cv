@@ -21,7 +21,7 @@ public class SecurityConfiguration {
 
      String[] PUBLIC_ENDPOINTS ={
              "/",
-             "/api/v1/login"
+             "/api/v1/auth/login"
      };
 
     @Bean
@@ -59,7 +59,7 @@ public class SecurityConfiguration {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new
                 JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("manhnt");// manhnt -> SecurityService
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("user");// user -> SecurityService
         JwtAuthenticationConverter jwtAuthenticationConverter = new
                 JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

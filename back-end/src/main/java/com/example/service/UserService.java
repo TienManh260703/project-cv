@@ -30,4 +30,6 @@ public interface UserService {
 
     void deleted(Long id) throws DataNoFoundException;
 
+    void updateUserToken (String token, String email) throws DataNoFoundException;
+
 }

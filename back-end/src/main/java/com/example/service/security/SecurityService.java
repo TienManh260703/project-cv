@@ -1,5 +1,6 @@
 package com.example.service.security;
 
+import com.example.dto.response.LoginResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,18 +31,36 @@ public class SecurityService {
     @Value("${manh-nt.jwt.base64-secret}")
     String jwtKey;
 
-    @Value("${manh-nt.jwt.token-validity-in-seconds}")
-    Long jwtKeyExpiration;
+    @Value("${manh-nt.jwt.access-token-validity-in-seconds}")
+    Long accessTokenExpiration;
 
-    public String createToken(Authentication authentication) {
+    @Value("${manh-nt.jwt.refresh-token-validity-in-seconds}")
+    Long refreshTokenExpiration;
+
+    public String createAccessToken(Authentication authentication, LoginResponse.UserLoginResponse userLoginResponse) {
         Instant now = Instant.now();
-        Instant validity = now.plus(this.jwtKeyExpiration, ChronoUnit.SECONDS);
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("manhnt", authentication)
+                .claim("user", userLoginResponse)
+                .build();
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
+                claims)).getTokenValue();
+    }
+
+    public String refreshToken(String email , LoginResponse loginResponse) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("user", loginResponse.getUser())
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
@@ -53,7 +72,7 @@ public class SecurityService {
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
 
-    //    private static String extractPrincipal(Authentication authentication) {
+//    private static String extractPrincipal(Authentication authentication) {
 //        if (authentication == null) {
 //            return null;
 //        } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
